@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FinPath AI Research</title>
+<meta name="description" content="FinPath AI: an independent high school research project on what it really costs an international student to study at a U.S. public college, and how sure a family can be of that number.">
+<style>
+  :root {
+    --bg: #fbfaf7;
+    --surface: #ffffff;
+    --ink: #1c1d21;
+    --muted: #5d6070;
+    --line: #e4e2dc;
+    --accent: #1f5f8b;
+    --accent-ink: #ffffff;
+    --accent-soft: #e6eff6;
+    --c-tuition: #1f5f8b;
+    --c-housing: #4f8fbf;
+    --c-meals: #9cc3e0;
+    --c-books: #c98a2b;
+    --c-assumed: #8a8d99;
+    --c-intl: #1f5f8b;
+    --c-instate: #b9c7d3;
+    --ok: #2e7d4f;
+    --ok-soft: #e4f2ea;
+    --part: #9a6a12;
+    --part-soft: #f8eedb;
+    --todo: #6b6e7a;
+    --todo-soft: #ecebe8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121317;
+      --surface: #1b1d22;
+      --ink: #ecebe7;
+      --muted: #a2a5b0;
+      --line: #2e3038;
+      --accent: #6fb0e0;
+      --accent-ink: #0d1a24;
+      --accent-soft: #1d2c38;
+      --c-tuition: #4f9bd4;
+      --c-housing: #7cb6e2;
+      --c-meals: #b5d6ee;
+      --c-books: #e0a34a;
+      --c-assumed: #8d909c;
+      --c-intl: #6fb0e0;
+      --c-instate: #46525d;
+      --ok: #7fcf9f;
+      --ok-soft: #1c3026;
+      --part: #e6b45c;
+      --part-soft: #352a15;
+      --todo: #a2a5b0;
+      --todo-soft: #26282e;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 17px/1.6 Georgia, "Iowan Old Style", "Times New Roman", serif;
+  }
+  .sans, h1, h2, h3, .btn, .stat, table, .badge, .eyebrow, nav, .caption, .legend, footer {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+  a { color: var(--accent); }
+  a:hover { text-decoration-thickness: 2px; }
+
+  /* Top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 56px; }
+  .brand { font-weight: 700; font-size: 16px; letter-spacing: -0.01em; color: var(--ink); text-decoration: none; }
+  nav { display: flex; gap: 18px; font-size: 14px; }
+  nav a { color: var(--muted); text-decoration: none; }
+  nav a:hover { color: var(--ink); }
+  @media (max-width: 720px) { nav { display: none; } }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent); color: var(--accent-ink);
+    padding: 10px 18px; border-radius: 8px;
+    font-weight: 600; font-size: 15px; text-decoration: none; white-space: nowrap;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn.small { padding: 7px 14px; font-size: 14px; }
+  .btn.ghost { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
+
+  /* Hero */
+  header.hero { padding: 56px 0 36px; }
+  .eyebrow { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  h1 { font-size: clamp(34px, 6vw, 52px); line-height: 1.08; letter-spacing: -0.025em; margin: 10px 0 16px; }
+  .lede { font-size: 20px; color: var(--muted); margin: 0 0 24px; max-width: 680px; }
+  .byline { font-size: 15px; color: var(--muted); margin-bottom: 26px; }
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  /* Stats */
+  .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 36px 0 8px; }
+  @media (min-width: 760px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+  .stat .num { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
+  .stat .lbl { font-size: 13.5px; color: var(--muted); line-height: 1.4; margin-top: 6px; }
+  .note { font-size: 13px; color: var(--muted); }
+
+  /* Sections */
+  section { padding: 36px 0; border-top: 1px solid var(--line); }
+  h2 { font-size: 28px; letter-spacing: -0.02em; margin: 0 0 14px; }
+  h3 { font-size: 19px; letter-spacing: -0.01em; margin: 28px 0 8px; }
+  p { margin: 0 0 14px; }
+  ul, ol { padding-left: 22px; margin: 0 0 14px; }
+  li { margin-bottom: 6px; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; margin: 14px 0; }
+  .card h3 { margin-top: 0; }
+  .card p:last-child { margin-bottom: 0; }
+
+  .badge { display: inline-block; font-size: 12.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px; margin-bottom: 10px; }
+  .b-ok { background: var(--ok-soft); color: var(--ok); }
+  .b-part { background: var(--part-soft); color: var(--part); }
+  .b-todo { background: var(--todo-soft); color: var(--todo); }
+
+  .takeaways { background: var(--accent-soft); border-radius: 10px; padding: 18px 20px 6px; margin: 8px 0 20px; }
+  .takeaways h3 { margin-top: 0; }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin: 14px 0 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  th { font-weight: 600; color: var(--muted); font-size: 13px; }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+
+  /* Figures */
+  figure { margin: 22px 0; }
+  .fig { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 18px 14px; }
+  .fig-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif; font-weight: 600; font-size: 15px; margin-bottom: 2px; }
+  .fig-sub { font-size: 13px; color: var(--muted); margin-bottom: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif; }
+  .caption { font-size: 13.5px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+
+  /* Stacked bars */
+  .sbar-row { margin-bottom: 14px; }
+  .sbar-label { display: flex; justify-content: space-between; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif; font-size: 13.5px; margin-bottom: 5px; gap: 8px; }
+  .sbar-label span:first-child { font-weight: 600; }
+  .sbar-label small { color: var(--muted); font-weight: 400; }
+  .sbar-track { display: flex; height: 26px; border-radius: 5px; overflow: hidden; background: var(--todo-soft); }
+  .seg { height: 100%; border-right: 2px solid var(--surface); }
+  .seg:last-child { border-right: none; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--muted); margin-top: 12px; }
+  .legend i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+
+  /* Budget fit bars */
+  .fit-row { display: grid; grid-template-columns: 74px 1fr; gap: 10px; align-items: center; margin-bottom: 10px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif; font-size: 13.5px; }
+  .fit-row .b { font-weight: 600; }
+  .fit-bars { display: grid; gap: 3px; }
+  .fit-bar { display: flex; align-items: center; gap: 8px; }
+  .fit-bar .fill { height: 13px; border-radius: 3px; min-width: 2px; }
+  .fit-bar .v { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+
+  /* Range graphic */
+  .range { position: relative; height: 74px; margin: 6px 6px 4px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif; }
+  .range .axis { position: absolute; left: 0; right: 0; top: 34px; height: 2px; background: var(--line); }
+  .range .band { position: absolute; top: 27px; height: 16px; background: var(--c-housing); border-radius: 3px; }
+  .range .pt { position: absolute; top: 25px; width: 2px; height: 20px; background: var(--ink); }
+  .range .pt.pub { background: var(--c-assumed); }
+  .range .lab { position: absolute; font-size: 12.5px; white-space: nowrap; transform: translateX(-50%); }
+  .range .lab.top { top: 0; }
+  .range .lab.bot { top: 50px; color: var(--muted); }
+
+  .cta-band { text-align: center; padding: 40px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; margin: 10px 0; }
+  .cta-band h2 { margin-bottom: 8px; }
+  .cta-band p { color: var(--muted); max-width: 560px; margin: 0 auto 20px; }
+
+  .disclaimer { font-size: 14.5px; border-left: 3px solid var(--part); padding: 10px 14px; background: var(--part-soft); border-radius: 0 8px 8px 0; }
+
+  ol.refs { font-size: 14.5px; }
+  ol.refs li { margin-bottom: 8px; }
+
+  footer { border-top: 1px solid var(--line); padding: 26px 0 40px; font-size: 13px; color: var(--muted); }
+
+  @media print {
+    .topbar, .hero-actions, .cta-band .btn { display: none; }
+    body { background: #fff; }
+    section { break-inside: avoid-page; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top">FinPath AI</a>
+    <nav aria-label="Sections">
+      <a href="#overview">Overview</a>
+      <a href="#questions">Questions</a>
+      <a href="#methods">Methods</a>
+      <a href="#results">Results</a>
+      <a href="#limitations">Limitations</a>
+    </nav>
+    <a class="btn small" href="https://fin-path-ai.vercel.app" target="_blank" rel="noopener">Try the app &rarr;</a>
+  </div>
+</div>
+
+<main class="wrap" id="top">
+
+  <header class="hero">
+    <div class="eyebrow">Independent High School Research Project</div>
+    <h1>What does it really cost an international student to study at a U.S. public college?</h1>
+    <p class="lede">And how sure can a family be of that number? FinPath AI combines public data, a cost model, simulation and behavioral economics to answer both questions.</p>
+    <div class="byline">By Ritvik</div>
+    <div class="hero-actions">
+      <a class="btn" href="https://fin-path-ai.vercel.app" target="_blank" rel="noopener">Try the interactive app &rarr;</a>
+      <a class="btn ghost" href="#results">See the findings</a>
+    </div>
+
+    <div class="stats" aria-label="At a glance">
+      <div class="stat"><div class="num">461</div><div class="lbl">U.S. public four-year colleges analyzed</div></div>
+      <div class="stat"><div class="num">$144k &rarr; $192k</div><div class="lbl">median published four-year price vs median modeled cost for an international student</div></div>
+      <div class="stat"><div class="num">+33%</div><div class="lbl">median gap between the two (middle 80% of colleges: +22% to +48%)</div></div>
+      <div class="stat"><div class="num">58% vs 97%</div><div class="lbl">colleges that fit a $50,000-a-year budget: international student vs in-state resident</div></div>
+    </div>
+    <p class="note">Costs: 2025&ndash;26. Admission rate: 2024&ndash;25.</p>
+  </header>
+
+  <section id="overview">
+    <h2>Project overview</h2>
+    <p>This independent research project explores how international students can evaluate the financial implications of studying in the United States. It combines economics, data analysis, artificial intelligence and behavioral psychology.</p>
+
+    <h3>Objective</h3>
+    <p>To give a student and their family a transparent way to see three things: the full four-year cost of a U.S. public college, not just the published price; how uncertain that cost is; and how personal priorities and fears can shape the decision. Every number comes from public data, the project's own code, or an assumption that is stated on this page.</p>
+
+    <h3>Why it matters</h3>
+    <p>Published prices leave out costs that a student will face, such as health insurance, flights home, visa fees and four years of price growth. International students are also generally charged out-of-state rates at public colleges. In this dataset, 95% of colleges charge out-of-state students more. At the typical college, out-of-state tuition is about 2.2 times in-state tuition (median $22,200 a year out-of-state vs $10,600 in-state).</p>
+
+    <h3>What was built</h3>
+    <p>An <a href="https://fin-path-ai.vercel.app" target="_blank" rel="noopener">interactive web app</a> with five parts:</p>
+    <ul>
+      <li><strong>Overview and Compare:</strong> the published price next to the fuller cost, for up to 10 colleges a student picks.</li>
+      <li><strong>Simulation:</strong> 510 simulated futures per college, and the chance of going over a budget, in the student's home currency.</li>
+      <li><strong>Best fit:</strong> a ranking that uses weights the student sets for affordability, location, prestige, family and friends, and safety.</li>
+      <li><strong>Scenario:</strong> sliders for &ldquo;what if&rdquo; changes, and a link that shares the exact scenario.</li>
+      <li><strong>AI Optimizer:</strong> a search for the most comfortable plan that fits a budget, with a plain-language explanation from an AI model.</li>
+    </ul>
+  </section>
+
+  <section id="questions">
+    <h2>Research questions</h2>
+    <p>Each question states how far this project has answered it. Some parts are answered with data, some are modeled but not yet tested with real students, and one is future work.</p>
+
+    <div class="card">
+      <span class="badge b-ok">Mostly addressed</span>
+      <h3>1. How do tuition, living expenses and financial aid influence college affordability?</h3>
+      <p><strong>What the project does:</strong> it builds the four-year cost from tuition and fees, room and board, and books and other allowances (College Scorecard), plus assumed insurance, flights and visa fees, grown with inflation. It then shows how those parts add up and how many colleges fit a given budget (Figures 1 and 2).</p>
+      <p><strong>Not covered:</strong> financial aid appears only as a scholarship amount a user can enter. The Scorecard's aid figures describe students who received U.S. federal aid, and international students are generally not in that group.</p>
+    </div>
+
+    <div class="card">
+      <span class="badge b-part">Partly addressed</span>
+      <h3>2. How does financial uncertainty affect long-term educational investment?</h3>
+      <p><strong>What the project does:</strong> it measures the uncertainty in the cost: inflation, scholarship renewal, surprise costs and exchange rates. A simulation gives a range of outcomes and the chance of exceeding a budget (Figure 3).</p>
+      <p><strong>Not covered:</strong> the project does not model the returns to education (earnings, employment) or how uncertainty changes a family's decision to invest. That part is future work.</p>
+    </div>
+
+    <div class="card">
+      <span class="badge b-part">Modeled, not yet tested with students</span>
+      <h3>3. How do behavioral biases influence student financial decisions?</h3>
+      <p><strong>What the project does:</strong> it turns several biases into explicit, adjustable model parts: the gap between the published price and the full cost (anchoring on the sticker price), loss aversion (an overspend counts more than the same amount of savings), and preferences such as prestige, location and the influence of family and friends. See Finding 4.</p>
+      <p><strong>Not covered:</strong> no survey or experiment with real students has been run yet. The model shows what these assumptions imply; it does not show how students actually behave.</p>
+    </div>
+
+    <div class="card">
+      <span class="badge b-todo">Not yet addressed (future work)</span>
+      <h3>4. How does international student spending contribute to local economies?</h3>
+      <p><strong>What the project has:</strong> a per-student breakdown of spending by category (Figure 1), which is one building block for this question.</p>
+      <p><strong>What is missing:</strong> enrollment counts and an economic model of how spending ripples through a local economy. For context only, NAFSA and JB International estimate that international students contributed $42.9 billion to the U.S. economy and supported 355,736 jobs in 2024&ndash;25. This project did not reproduce or test that estimate.</p>
+    </div>
+  </section>
+
+  <section id="methods">
+    <h2>Methodology</h2>
+
+    <h3>Data</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Source</th><th>Used for</th><th>Details</th></tr></thead>
+        <tbody>
+          <tr><td>U.S. Department of Education, College Scorecard</td><td>Tuition and fees (in-state and out-of-state), room and board, books, other expense allowances, admission rate</td><td>461 public four-year colleges. Costs: 2025&ndash;26. Admission rate: 2024&ndash;25.</td></tr>
+          <tr><td>College Board, Trends in College Pricing 2025</td><td>Yearly growth of tuition, and of housing and food</td><td>Tuition 3.4% a year, housing and meals 4.4%</td></tr>
+          <tr><td>U.S. Bureau of Labor Statistics, CPI (September 2026)</td><td>Yearly growth of flights, and of books and other costs</td><td>Flights 3.7%, other 2.6%</td></tr>
+          <tr><td>KFF, 2026 Employer Health Benefits Survey</td><td>Yearly growth of health insurance</td><td>5% a year</td></tr>
+          <tr><td>Frankfurter exchange-rate API</td><td>Today's USD rates for INR, CNY, KRW and CAD, and their 5-year trend and swing</td><td>Reference rates, not what a bank charges</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">In this version the 5-year exchange-rate statistics are still placeholders, so this page reports no result that depends on them. The currency figures below are plain arithmetic, not forecasts.</p>
+
+    <h3>Cost model</h3>
+    <p>For each year, the model adds tuition and fees (minus any scholarship), housing, meals, books and the college's own other-expense allowance, health insurance, flights home and, in year one, visa fees. Housing and meals are split from the Scorecard's single room-and-board figure with a fixed 55/45 split, which is an assumption. Each cost grows at its own yearly rate from the table above.</p>
+
+    <h3>The baseline student used for the results</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Item</th><th>Value</th><th>Basis</th></tr></thead>
+        <tbody>
+          <tr><td>Tuition rate</td><td>Out-of-state at every college</td><td>International students are generally charged out-of-state rates</td></tr>
+          <tr><td>Housing and meals</td><td>On campus, full meal plan</td><td>Scorecard on-campus figures</td></tr>
+          <tr><td>Books and other expenses</td><td>The college's own allowance</td><td>Scorecard</td></tr>
+          <tr><td>Health insurance</td><td>$2,500 a year</td><td>Assumed, the same for every college</td></tr>
+          <tr><td>Flights home</td><td>One round trip a year at $1,400</td><td>Assumed, the same for every college</td></tr>
+          <tr><td>Visa fees</td><td>$350 (SEVIS) + $185 (visa application), once</td><td>Government fees as checked in October 2026</td></tr>
+          <tr><td>Deposits</td><td>Credited to the first bill</td><td>Assumed</td></tr>
+          <tr><td>Scholarship</td><td>None</td><td>Baseline only</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Simulation of uncertainty</h3>
+    <p>For each college, the model plays out the four years 510 times. Each run randomly varies the yearly growth of every cost category, the exchange rate (a random walk using the currency's 5-year trend and swing), whether a scholarship is renewed each year (85% chance a year; once lost, it stays lost), and surprise costs (25% chance a year, typically about $1,500 but sometimes much more). The random numbers are seeded, so results are repeatable. The output is a low case (10th percentile), a middle case (median), a high case (90th percentile), and the chance of exceeding a budget. The spreads used for the random variation are assumptions, not measurements.</p>
+
+    <h3>Decision support</h3>
+    <p>Two further tools use the same calculation. &ldquo;Best fit&rdquo; scores each college from 0 to 100 on affordability, location, prestige, family and friends, and safety, and combines the scores using weights the student sets. The &ldquo;AI Optimizer&rdquo; tests every combination of housing, bedroom and meal plan with the simulation and recommends the most comfortable one that stays within a budget and a chosen risk of overspending.</p>
+
+    <h3>How AI is used</h3>
+    <p>An AI model (Anthropic's Claude) is used in one place only: to explain, in plain language, results that the code has already calculated. It is never asked for tuition or any other price. The server builds the request itself from numbers and a few fixed words, and every number in the answer is checked against the app's own figures. An answer with a number that does not match is discarded and a built-in summary is shown instead. The tool works fully without the AI.</p>
+  </section>
+
+  <section id="results">
+    <h2>Results</h2>
+    <p>All results are model estimates for the baseline student described above, in U.S. dollars, using the assumptions listed in the methodology. They are not predictions or quotes.</p>
+
+    <div class="takeaways">
+      <h3>Key takeaways</h3>
+      <ul>
+        <li>At the median college, the modeled four-year cost is about <strong>33% higher</strong> than the published price (for the middle 80% of colleges: 22% to 48% higher).</li>
+        <li>International students have far fewer affordable options: at $50,000 a year, <strong>58%</strong> of the colleges fit, compared with 97% for an in-state resident.</li>
+        <li>In dollars alone, the uncertainty around the middle estimate is small: planning about <strong>2% above it</strong> covers 90% of simulated futures. Exchange-rate changes are a separate risk, shown under Finding 3.</li>
+      </ul>
+    </div>
+
+    <h3>Finding 1: the modeled cost is about a third higher than the published price</h3>
+    <p>For the median college, the modeled four-year cost is $192,000, against a published price of $144,000: 33% higher. Without inflation, it would be 26% higher.</p>
+    <p>Across the colleges, about 45% of the extra cost beyond the published price comes from the Scorecard's own books and other-expense allowances (real data), 33% from items assumed in the model (insurance, flights, visa fees), and 22% from four years of price growth. So roughly a third of the gap rests on assumed values that are the same for every college.</p>
+    <p>Where the money goes, on average: tuition and fees are 51% of the modeled total, housing and meals 29%, books and allowances 11%, and insurance, flights and visa fees 8%.</p>
+
+    <figure>
+      <div class="fig" role="img" aria-label="Stacked bars: published price $154k average; modeled without inflation $192k; modeled with inflation $203k.">
+        <div class="fig-title">Published price vs modeled four-year cost</div>
+        <div class="fig-sub">Average of 461 U.S. public four-year colleges, international student (US dollars)</div>
+
+        <div class="sbar-row">
+          <div class="sbar-label"><span>Published price <small>tuition + room and board, today's prices</small></span><span>$154k</span></div>
+          <div class="sbar-track" style="width: 75.9%">
+            <div class="seg" style="flex: 99; background: var(--c-tuition)"></div>
+            <div class="seg" style="flex: 30; background: var(--c-housing)"></div>
+            <div class="seg" style="flex: 25; background: var(--c-meals)"></div>
+          </div>
+        </div>
+
+        <div class="sbar-row">
+          <div class="sbar-label"><span>Modeled, no inflation <small>adds the hidden costs</small></span><span>$192k</span></div>
+          <div class="sbar-track" style="width: 94.6%">
+            <div class="seg" style="flex: 99; background: var(--c-tuition)"></div>
+            <div class="seg" style="flex: 30; background: var(--c-housing)"></div>
+            <div class="seg" style="flex: 25; background: var(--c-meals)"></div>
+            <div class="seg" style="flex: 22; background: var(--c-books)"></div>
+            <div class="seg" style="flex: 16; background: var(--c-assumed)"></div>
+          </div>
+        </div>
+
+        <div class="sbar-row">
+          <div class="sbar-label"><span>Modeled, with inflation <small>and four years of price growth</small></span><span>$203k</span></div>
+          <div class="sbar-track" style="width: 100%">
+            <div class="seg" style="flex: 104; background: var(--c-tuition)"></div>
+            <div class="seg" style="flex: 32; background: var(--c-housing)"></div>
+            <div class="seg" style="flex: 26; background: var(--c-meals)"></div>
+            <div class="seg" style="flex: 23; background: var(--c-books)"></div>
+            <div class="seg" style="flex: 18; background: var(--c-assumed)"></div>
+          </div>
+        </div>
+
+        <div class="legend">
+          <span><i style="background: var(--c-tuition)"></i>Tuition and fees</span>
+          <span><i style="background: var(--c-housing)"></i>Housing</span>
+          <span><i style="background: var(--c-meals)"></i>Meals</span>
+          <span><i style="background: var(--c-books)"></i>Books and the college's own allowances</span>
+          <span><i style="background: var(--c-assumed)"></i>Health insurance, flights home, visa fees (assumed)</span>
+        </div>
+      </div>
+      <figcaption class="caption">Figure 1. Published price vs modeled four-year cost, averaged over 461 public colleges. The orange and gray segments are what a student who looks only at the published price would miss.</figcaption>
+    </figure>
+
+    <h3>Finding 2: costs vary widely, and the international premium is large</h3>
+    <p>The modeled four-year cost ranges from $115,000 to $394,000. The middle 80% of colleges fall between $149,000 and $275,000.</p>
+    <p>A student who is a resident of the college's own state would face a median modeled cost of $141,000, which is $51,000 less than the international student's median of $192,000. Figure 2 shows what that means for budgets.</p>
+
+    <figure>
+      <div class="fig" role="img" aria-label="Share of colleges that fit a yearly budget. International vs in-state: $30k 2% vs 12%; $40k 18% vs 76%; $50k 58% vs 97%; $60k 80% vs 100%; $80k 97% vs 100%.">
+        <div class="fig-title">How many colleges fit a yearly budget?</div>
+        <div class="fig-sub">Share of the 461 colleges whose modeled four-year cost fits within four times the yearly budget</div>
+
+        <div class="fit-row"><div class="b">$30,000</div><div class="fit-bars">
+          <div class="fit-bar"><div class="fill" style="width: 2%; background: var(--c-intl)"></div><span class="v">2%</span></div>
+          <div class="fit-bar"><div class="fill" style="width: 12%; background: var(--c-instate)"></div><span class="v">12%</span></div>
+        </div></div>
+        <div class="fit-row"><div class="b">$40,000</div><div class="fit-bars">
+          <div class="fit-bar"><div class="fill" style="width: 18%; background: var(--c-intl)"></div><span class="v">18%</span></div>
+          <div class="fit-bar"><div class="fill" style="width: 76%; background: var(--c-instate)"></div><span class="v">76%</span></div>
+        </div></div>
+        <div class="fit-row"><div class="b">$50,000</div><div class="fit-bars">
+          <div class="fit-bar"><div class="fill" style="width: 58%; background: var(--c-intl)"></div><span class="v">58%</span></div>
+          <div class="fit-bar"><div class="fill" style="width: 97%; background: var(--c-instate)"></div><span class="v">97%</span></div>
+        </div></div>
+        <div class="fit-row"><div class="b">$60,000</div><div class="fit-bars">
+          <div class="fit-bar"><div class="fill" style="width: 80%; background: var(--c-intl)"></div><span class="v">80%</span></div>
+          <div class="fit-bar"><div class="fill" style="width: 100%; background: var(--c-instate)"></div><span class="v">100%</span></div>
+        </div></div>
+        <div class="fit-row"><div class="b">$80,000</div><div class="fit-bars">
+          <div class="fit-bar"><div class="fill" style="width: 97%; background: var(--c-intl)"></div><span class="v">97%</span></div>
+          <div class="fit-bar"><div class="fill" style="width: 100%; background: var(--c-instate)"></div><span class="v">100%</span></div>
+        </div></div>
+
+        <div class="legend">
+          <span><i style="background: var(--c-intl)"></i>International student (pays out-of-state rates)</span>
+          <span><i style="background: var(--c-instate)"></i>In-state resident (reference)</span>
+        </div>
+      </div>
+      <figcaption class="caption">Figure 2. At $40,000 a year, about three in four colleges fit an in-state resident's budget, but fewer than one in five fit an international student's.</figcaption>
+    </figure>
+
+    <h3>Finding 3: in dollars, the uncertainty is small; the currency is a separate risk</h3>
+    <p>Running the simulation for all 461 colleges, the likely range (the 10th to the 90th percentile) is about 3% wide, measured against the middle estimate. To be 90% sure of staying within a budget, a family would plan about 2% above the middle estimate (at most 3% for any college).</p>
+    <p>Figure 3 shows one typical college: The University of Texas at El Paso (TX), chosen because its modeled cost is closest to the median of all 461.</p>
+
+    <figure>
+      <div class="fig" role="img" aria-label="On a scale from $140k to $210k: published price $144,424; simulated likely range $191,191 to $197,686 with middle $194,033.">
+        <div class="fig-title">510 simulated futures for one typical college</div>
+        <div class="fig-sub">The University of Texas at El Paso (TX), US dollars. Exchange-rate changes not included.</div>
+        <!-- Scale: $140k = 0%, $210k = 100% -->
+        <div class="range">
+          <div class="axis"></div>
+          <div class="pt pub" style="left: 6.3%"></div>
+          <div class="lab top" style="left: 6.3%">Published</div>
+          <div class="lab bot" style="left: 6.3%">$144,424</div>
+          <div class="band" style="left: 73.1%; width: 9.3%"></div>
+          <div class="pt" style="left: 77.2%"></div>
+          <div class="lab top" style="left: 77.8%">Simulated</div>
+          <div class="lab bot" style="left: 77.8%">$191k&ndash;$198k</div>
+        </div>
+        <div class="legend">
+          <span><i style="background: var(--c-housing)"></i>Likely range: 80% of futures, $191,191 to $197,686</span>
+          <span><i style="background: var(--ink)"></i>Middle of the simulation: $194,033</span>
+        </div>
+      </div>
+      <figcaption class="caption">Figure 3. Every simulated future lies far to the right of the published price.</figcaption>
+    </figure>
+
+    <p>This narrow range is a result of the assumptions: small spreads in the growth rates, and no scholarship in the baseline. It does not include exchange-rate changes. Because every cost is paid in dollars, a family whose budget is in another currency carries that currency risk on the whole bill. As plain arithmetic, not a forecast:</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Home currency weakens against the dollar by</th><th class="num">Extra cost in dollar terms</th></tr></thead>
+        <tbody>
+          <tr><td>5%</td><td class="num">$10,000</td></tr>
+          <tr><td>10%</td><td class="num">$19,000</td></tr>
+          <tr><td>20%</td><td class="num">$38,000</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">For a family that budgeted exactly the median modeled cost ($192,000).</p>
+
+    <h3>Finding 4: behavioral biases are modeled, not yet measured</h3>
+    <p>The project turns several ideas from behavioral economics into adjustable parts of the model:</p>
+    <ul>
+      <li><strong>Anchoring on the sticker price.</strong> The gap in Finding 1 is the size of the error a student would make by relying on the published price alone.</li>
+      <li><strong>Loss aversion.</strong> In the &ldquo;Best fit&rdquo; score, going over budget counts a chosen number of times as much as having the same amount to spare. The default is 2, based on published estimates of about 2.25 (Tversky and Kahneman, 1992) and about 1.96 (a 2024 meta-analysis).</li>
+      <li><strong>Preferences and influence.</strong> Prestige, location, the views of family and friends, and safety enter as weights that the student sets. A &ldquo;worry about jobs and visas&rdquo; setting makes affordability count more.</li>
+    </ul>
+    <p>These are model parameters. No experiment or survey with students has been run yet, so this page makes no claim about how strongly any of them affects real decisions.</p>
+    <p>For context from existing research on U.S. households and students (not specifically international students): in a survey of U.S. household heads, 61% reported net public college costs that exceed the actual net costs, and 75% underestimated the earnings benefit of college (Bleemer and Zafar, 2015). Among college enrollees, the average belief of earning a bachelor's degree by age 30 was 92%, while about 70% actually did (Moschini, Raveendranathan and Xu, 2023). People can misjudge college costs and outcomes in both directions, which is why the project shows the full cost and its range.</p>
+  </section>
+
+  <section id="tech">
+    <h2>Technologies used</h2>
+    <ul>
+      <li><strong>Languages:</strong> JavaScript (ES modules), JSX, HTML, CSS. Command-line scripts run on Node.js.</li>
+      <li><strong>Front end:</strong> React, Vite, Tailwind CSS (v4), Recharts for charts in the app, rc-slider for sliders.</li>
+      <li><strong>Back end and AI:</strong> a Vercel serverless function (Node.js) that calls the Anthropic Claude API, with per-visitor rate limits.</li>
+      <li><strong>Data and services:</strong> the College Scorecard (a CSV file) and the Frankfurter exchange-rate API.</li>
+      <li><strong>Methods:</strong> a deterministic cost model, Monte Carlo simulation with a seeded random-number generator, percentile statistics, log-return statistics for exchange rates, weighted scoring, and an exhaustive search over plan options.</li>
+      <li><strong>Tools:</strong> Visual Studio Code, Git and GitHub, Vercel (hosting the app), GitHub Pages (hosting this page).</li>
+    </ul>
+    <h3>AI assistance</h3>
+    <p>Claude, an AI assistant from Anthropic, was used as a coding and writing assistant during development. Inside the finished app, Claude is used only for the plain-language explanations described in the methodology.</p>
+  </section>
+
+  <section id="limitations">
+    <h2>Limitations</h2>
+    <h3>Data</h3>
+    <ul>
+      <li>Only 461 public four-year colleges are included. Private colleges are not, so the results do not describe them.</li>
+      <li>The College Scorecard counts students who received U.S. federal aid. International students are generally not in that group, so its earnings and aid figures are only a rough guide for them. The project does not use them in its results.</li>
+      <li>Costs are for the 2025&ndash;26 academic year and are then grown with assumed rates. Real prices in the year a student enrolls will differ.</li>
+      <li>The exchange rates are reference rates, not what a bank or card charges.</li>
+    </ul>
+    <h3>Assumptions</h3>
+    <ul>
+      <li>Health insurance, flights and deposits are single assumed values used for every college, not data for each one.</li>
+      <li>The 55/45 split of room and board, the 25% discount for a shared bedroom, and the rule that a commute limit only decides whether off-campus housing is allowed have no data behind them.</li>
+      <li>The spreads of the random variation, the scholarship-renewal chance and the surprise-cost settings are assumptions.</li>
+      <li>The inflation rates come from published sources, but each is a single recent figure, not a forecast.</li>
+    </ul>
+    <h3>Method</h3>
+    <ul>
+      <li>The model has not been validated against real students' bills or surveys.</li>
+      <li>The behavioral parts are model settings. No human-subjects study has been done.</li>
+      <li>The project covers undergraduate costs only, and does not model earnings or employment after graduation.</li>
+    </ul>
+
+    <h3>Areas for future research</h3>
+    <ol>
+      <li>Compare the model's estimates with actual student bills and a survey of international students.</li>
+      <li>Test the behavioral ideas with a survey or experiment, for example by comparing students' own cost estimates with the modeled cost.</li>
+      <li>Add the returns side (earnings and employment) to study long-term educational investment, taking care with data that exclude international students.</li>
+      <li>Address the local-economy question with enrollment counts and an economic multiplier model.</li>
+      <li>Replace assumed insurance, deposit and off-campus figures with data for each college, and add private colleges.</li>
+      <li>Find data on aid to international students, such as institutions' Common Data Set reports.</li>
+    </ol>
+  </section>
+
+  <section>
+    <div class="cta-band">
+      <h2>Try FinPath AI</h2>
+      <p>Pick colleges, set a budget in your home currency, and see the full four-year cost, its range, and the plan that fits best.</p>
+      <a class="btn" href="https://fin-path-ai.vercel.app" target="_blank" rel="noopener">Open the interactive app &rarr;</a>
+    </div>
+    <p class="disclaimer">This is an educational estimate, not financial, tax, legal or immigration advice. Check real costs and aid with each college. FinPath AI is not affiliated with or endorsed by the U.S. Department of Education, College Board, any college, or Anthropic.</p>
+  </section>
+
+  <section id="author">
+    <h2>Author</h2>
+    <p><strong>Ritvik</strong><br>Independent High School Research Project</p>
+  </section>
+
+  <section id="references">
+    <h2>Data and references</h2>
+    <ol class="refs">
+      <li>U.S. Department of Education. <a href="https://collegescorecard.ed.gov/data/" target="_blank" rel="noopener">College Scorecard data</a>.</li>
+      <li>College Board. <a href="https://research.collegeboard.org/trends/college-pricing/highlights" target="_blank" rel="noopener">Trends in College Pricing and Student Aid 2025</a>.</li>
+      <li>U.S. Bureau of Labor Statistics. <a href="https://www.bls.gov/opub/ted/2026/prices-for-gasoline-increased-34-2-percent-over-the-year-ended-september-2026.htm" target="_blank" rel="noopener">Consumer Price Index, September 2026</a>.</li>
+      <li>KFF. <a href="https://www.kff.org/health-costs/2026-employer-health-benefits-survey/" target="_blank" rel="noopener">2026 Employer Health Benefits Survey</a>.</li>
+      <li><a href="https://frankfurter.dev" target="_blank" rel="noopener">Frankfurter</a>. Exchange-rate API.</li>
+      <li>Bleemer, Z., and Zafar, B. (2015). <a href="https://www.newyorkfed.org/research/staff_reports/sr739.html" target="_blank" rel="noopener">Intended College Attendance: Evidence from an Experiment on College Returns and Costs</a>. Federal Reserve Bank of New York Staff Report No. 739.</li>
+      <li>Moschini, E. G., Raveendranathan, G., and Xu, M. (2023). <a href="https://www.aeaweb.org/conference/2023/program/paper/KeFiB6ds" target="_blank" rel="noopener">Over-optimism About Graduation and College Financial Aid</a>. Working paper.</li>
+      <li>Tversky, A., and Kahneman, D. (1992). Advances in prospect theory: Cumulative representation of uncertainty. <em>Journal of Risk and Uncertainty</em>, 5, 297&ndash;323.</li>
+      <li>The Healthcare Economist. <a href="https://healthcare-economist.com/?p=16453" target="_blank" rel="noopener">Summary of a 2024 meta-analysis of loss aversion</a>.</li>
+      <li>NAFSA and JB International. <a href="https://www.nafsa.org/economicvalue" target="_blank" rel="noopener">International Student Economic Value Tool</a>, 2024&ndash;25 academic year.</li>
+      <li>Beine, M., Noel, R., and Ragot, L. <a href="https://orbilu.uni.lu/handle/10993/17905" target="_blank" rel="noopener">Determinants of the international mobility of students</a>.</li>
+      <li>IDP Connect studies, summarized by <a href="https://monitor.icef.com/?p=25413" target="_blank" rel="noopener">ICEF Monitor</a>, on the role of parents in choosing where to study.</li>
+    </ol>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    FinPath AI &middot; Independent High School Research Project &middot; &copy; 2026 Ritvik. Estimates for education planning only; not financial, tax, legal or immigration advice.
+  </div>
+</footer>
+
+</body>
+</html>
